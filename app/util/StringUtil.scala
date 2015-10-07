@@ -7,16 +7,41 @@ import java.text.SimpleDateFormat
  */
 object StringUtil {
 
-  def changeHtmlString(str: String): String = {
+  /**
+   *
+   * @param str
+   * @return
+   */
+  def changeHtmlString(str: String) = {
     str.replaceAllLiterally("\\n", "").replaceAllLiterally("\"]", "").replaceAllLiterally("[\"", "")
   }
 
-  def deleteQuot(str: String): String = {
+  /**
+   *
+   * @param str
+   * @return
+   */
+  def deleteQuot(str: String) = {
     str.replaceAllLiterally("\"", "")
   }
 
-  def changeDateFormat(str: String): String = {
+  /**
+   *
+   * @param str
+   * @return
+   */
+  def changeDateFormat(str: String) = {
     val sdf: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd");
     "%tY年%<tm月%<td日" format sdf.parse(str.replaceAllLiterally("\"", ""))
+  }
+
+  /**
+   *
+   * @param str
+   * @return
+   */
+  def createFp(str: String) = {
+    val strs: List[String] = str.split(" ").toList
+    strs.map(s => "&fq=" + s).mkString
   }
 }

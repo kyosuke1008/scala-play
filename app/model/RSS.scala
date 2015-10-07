@@ -21,6 +21,7 @@ object RSS {
       case id ~ name ~ url => RSS(id, name, url)
     }
   }
+
   def findAll(): Seq[RSS] = {
     DB.withConnection { implicit connection =>
       SQL("SELECT * FROM RSS").as(RSS.simple *)
