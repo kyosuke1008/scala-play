@@ -15,40 +15,64 @@ import scala.concurrent.{Await, Future}
 
 class Application extends Controller {
 
+
+  val form = Form(
+    "word" -> text
+  )
+
   /**
    * index
    * @return index
    */
   def index = Action {
     val futureResponse: Future[WSResponse] =
-      WS.url("http://localhost:8983/solr/solrbook/select?q=*%3A*&rows=50&wt=json&indent=true").get()
-    Ok(views.html.index(makeJson(futureResponse)))
+      WS.url("http://localhost:8983/solr/solrbook/select?q=*%3A*&sort=updated+desc&rows=50&wt=json&indent=true").get()
+    val (stories, numFound) = makeJson(futureResponse)
+    Ok(views.html.index(stories, numFound)).withSession(
+      "word" -> "")
   }
 
-  val form = Form("word" -> text)
 
   /**
    * 検索結果
    * @return 検索結果
    */
   def select = Action { implicit request =>
-    val selectWord = StringUtil.createFp(form.bindFromRequest.get)
-    print(form.bindFromRequest.get)
+    val selectWord = form.bindFromRequest.get
+    val word = StringUtil.createFp(selectWord)
     val futureResponse: Future[WSResponse] =
-      WS.url("http://localhost:8983/solr/solrbook/select?q=*%3A*" + selectWord + "&rows=50&wt=json&indent=true").get()
-    Ok(views.html.index(makeJson(futureResponse)))
+      WS.url("http://localhost:8983/solr/solrbook/select?q=*%3A*&sort=updated+desc" + word + "&rows=50&wt=json&indent=true").get()
+    val (stories, numFound) = makeJson(futureResponse)
+    Ok(views.html.index(stories, numFound)).withSession(
+      "word" -> word)
   }
 
   /**
+   * ページ検索
+   * @return 検索結果
+   */
+  def page(p: Int) = Action { implicit request =>
+    val word = request.session.get("word").get
+    print("あああああああああああああああああ"+word)
+    val futureResponse: Future[WSResponse] =
+      WS.url("http://localhost:8983/solr/solrbook/select?q=*%3A*&sort=updated+desc" + word + "&rows=50&wt=json&indent=true").get()
+    val (stories, numFound) = makeJson(futureResponse)
+    Ok(views.html.index(stories, numFound)).withSession(
+      "selectWord" -> word)
+  }
+
+
+  /**
    *
-   * @param futureResponse
+   * @param futureResponse json,numFound
    * @return json
    */
   def makeJson(futureResponse: Future[WSResponse]) = {
-    val result: WSResponse = Await.result(futureResponse, Duration.Inf)
+    val result = Await.result(futureResponse, Duration.Inf)
     val json: JsValue = Json.parse(result.body)
     val title: Seq[JsValue] = json \\ "title"
-    title.indices.toList.map(i => NewsStory(
+    val numFound = json \ "response" \ "numFound"
+    val stories = title.indices.toList.map(i => NewsStory(
       (json \\ "info_url")(i).toString()
       , (json \\ "url")(i).toString()
       , (json \\ "title")(i).toString()
@@ -57,5 +81,6 @@ class Application extends Controller {
       , (json \\ "summary")(i).toString()
       , (json \\ "intended_reader")(i).toString()
       , (json \\ "updated")(i).toString()))
+    (stories, numFound.get.as[Int])
   }
 }

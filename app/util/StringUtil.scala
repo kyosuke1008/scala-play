@@ -44,4 +44,14 @@ object StringUtil {
     val strs: List[String] = str.split(" ").toList
     strs.map(s => "&fq=" + s).mkString
   }
+
+  /**
+   *
+   * @param num
+   * @return
+   */
+  def getPages(num: Int) = {
+    val page = num / 10 + (if (num % 10 == 0) 0 else 1)
+    (1 to page).toList
+  }
 }

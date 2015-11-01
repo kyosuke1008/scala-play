@@ -19,7 +19,7 @@ class SampleActor1 extends ActorBase {
 
   /** 処理本体 */
   def execute() = {
-    RSS.findAll().foreach(rss => {
+    RSS.findAll.foreach(rss => {
       val input: SyndFeedInput = new SyndFeedInput
       val feed: SyndFeed = input.build(new XmlReader(new URL(rss.url)))
       implicit val univWrites = Json.writes[NewsStory]
