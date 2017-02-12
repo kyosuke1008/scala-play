@@ -15,13 +15,12 @@ libraryDependencies ++= Seq(
   ws,
   specs2 % Test,
   evolutions,
-  "org.scalikejdbc" %% "scalikejdbc" % "2.2.6",
-  "org.scalikejdbc" %% "scalikejdbc-config" % "2.2.6",
-  "mysql" % "mysql-connector-java" % "5.1.24",
   "rome" % "rome" % "1.0",
   "org.jdom" % "jdom" % "2.0.2",
   "org.scalatestplus" %% "play" % "1.4.0-M4" % "test",
-  toGroupID("com.typesafe.play") %% "anorm" % "2.4.0"
+  "com.google.cloud" % "google-cloud-bigquery" % "0.8.0-beta",
+  "com.google.cloud" % "google-cloud-datastore" % "0.8.1-beta"
+
 )
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
